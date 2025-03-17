@@ -14,17 +14,38 @@ services:
       - ./public_media:/var/www/html/public/media
       - ./db:/var/www/html/var/db
     environment:
+      # 📌 設定資料庫連線 (修改 SECRET_USER_PASSWORD)
       - DATABASE_URL=mysql://partdb:SECRET_USER_PASSWORD@database:3306/partdb
+      - APP_ENV=docker
+
+      # 🌏 設定 Part-DB 使用繁體中文
+      - DEFAULT_LANG=zh
+      # 🕒 設定時區為台北
+      - DEFAULT_TIMEZONE=Asia/Taipei
+      # 💰 設定貨幣為新台幣
+      - BASE_CURRENCY=TWD
+      # 🔹 設定 Part-DB 網站名稱
+      - INSTANCE_NAME=零件管理系統
+
+      # 允許使用者下載附件
+      - ALLOW_ATTACHMENT_DOWNLOADS=1
+      - USE_GRAVATAR=0
 
   database:
     container_name: partdb_database
     image: mysql:8.0
     restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --log-bin-trust-function-creators=1
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
     environment:
+      # 📌 設定 MySQL 帳號密碼 (請修改 SECRET_*)
       MYSQL_ROOT_PASSWORD: SECRET_ROOT_PASSWORD
       MYSQL_DATABASE: partdb
       MYSQL_USER: partdb
       MYSQL_PASSWORD: SECRET_USER_PASSWORD
     volumes:
       - ./mysql:/var/lib/mysql
-
+ 
