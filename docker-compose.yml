@@ -1,0 +1,30 @@
+version: '3.3'
+
+services:
+  partdb:
+    container_name: partdb
+    build: .  # 讓 Docker 使用 Dockerfile 建立映像
+    restart: unless-stopped
+    depends_on:
+      - database
+    ports:
+      - "8080:80"
+    volumes:
+      - ./uploads:/var/www/html/uploads
+      - ./public_media:/var/www/html/public/media
+      - ./db:/var/www/html/var/db
+    environment:
+      - DATABASE_URL=mysql://partdb:SECRET_USER_PASSWORD@database:3306/partdb
+
+  database:
+    container_name: partdb_database
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: SECRET_ROOT_PASSWORD
+      MYSQL_DATABASE: partdb
+      MYSQL_USER: partdb
+      MYSQL_PASSWORD: SECRET_USER_PASSWORD
+    volumes:
+      - ./mysql:/var/lib/mysql
+
